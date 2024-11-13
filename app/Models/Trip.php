@@ -10,6 +10,14 @@ class Trip extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected $casts = [
+        'origin' => "array",
+        'destination' => "array",
+        'driver_location' => 'array',
+        "is_started" => "boolean",
+        "is_complete" => "boolean",
+    ];
+
 
     public function user()
     {
