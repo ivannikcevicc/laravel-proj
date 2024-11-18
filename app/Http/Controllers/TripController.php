@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Events\TripAccepted;
+use App\Events\TripCreated;
 use App\Events\TripEnded;
 use App\Events\TripLocationUpdated;
 use App\Events\TripStarted;
 use App\Models\Trip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TripController extends Controller
 {
@@ -18,7 +20,15 @@ class TripController extends Controller
             'destination' => 'required',
             'destination_name' => 'required',
         ]);
-        return $request->user()->trips()->create($request->only(['origin', 'destination', 'destination_name']));
+        $trip = $request->user()->trips()->create($request->only(['origin', 'destination', 'destination_name']));
+
+        Log::info('Trip created: ', ['trip' => $trip]);
+        Log::info('Dispatching TripCreated event');
+        broadcast(new TripCreated($trip, $request->user()));
+
+        // TripCreated::dispatch($trip, $request->user());
+
+        return $trip;
     }
     public function show(Request $request, Trip $trip)
     {
